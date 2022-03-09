@@ -2,22 +2,39 @@ import React, { useCallback, useEffect, useState } from "react";
 import useFetch from "../customHooks/useFetch";
 
 const City = ({ city }) => {
+  // states
+  const [location, setLocation] = useState([]);
   const [weather, setWeather] = useState([]);
+
+  // credentials
   const token =
     "b28ad73339f3c20cddcc62b425beda3d131ff439caa5686c339f296456d5c7f6";
-  const url = `https://api.meteo-concept.com/api/location/cities?token=${token}&search=${city}`;
-  const { isLoading, data } = useFetch(url);
 
+  // urls
+  const urlLocation = `https://api.meteo-concept.com/api/location/cities?token=${token}&search=${city}`;
+  const urlWeather = `http://api.meteo-concept.com/api/forecast/daily?token=${token}&insee=59350`;
+
+  // destructurations
+  const { isLoading: locationLoading, data: dataLocation } =
+    useFetch(urlLocation);
+  const { insee, cp, latitude, longitude, altitude, name } = location;
+  const { isLoading: weatherLoading, data: dataWeather } = useFetch(urlWeather);
+
+  // fetch
   const getLocation = useCallback(async () => {
-    const weather = await data;
-    setWeather(weather.cities[0]);
-  }, [data]);
-
-  const { insee, cp, latitude, longitude, altitude, name } = weather;
+    const location = await dataLocation.cities[0];
+    setLocation(location);
+  }, [dataLocation]);
+  const getWeather = useCallback(async () => {
+    console.log(dataWeather);
+    const weather = await dataWeather;
+    setWeather(weather);
+  }, [dataWeather]);
 
   useEffect(() => {
     getLocation();
-  }, [getLocation]);
+    getWeather();
+  }, [getLocation, getWeather]);
 
   return (
     <article>
